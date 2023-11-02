@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, Image, TextInput, Button} from 'react-native'
-// import { APP_URL } from '@env'
+import { APP_URL } from "@env"
 
 
 const SignUp = ({navigation}) => {
@@ -50,22 +50,22 @@ const SignUp = ({navigation}) => {
         // console.log(newErrors);
     }
 
-    const sendSignUpData = () => {
-        const requestData = {
-            username,
-            email,
-            contact,
-            address,
-            password
-        }
-        console.log(requestData);
+    // const sendSignUpData = () => {
+    //     const requestData = {
+    //         username,
+    //         email,
+    //         contact,
+    //         address,
+    //         password
+    //     }
+    //     console.log(requestData);
 
-        axios.post(`${APP_URL}/api/signup`, requestData).then((response) => {
-            console.log('API Response:', response.data);
-        }).catch((error)=> {
-            console.log(error);
-        });
-    }
+    //     axios.post(`${APP_URL}/api/signup`, requestData).then((response) => {
+    //         console.log('API Response:', response.data);
+    //     }).catch((error)=> {
+    //         console.log(error);
+    //     });
+    // }
   return (
     <>
         <View style= {signupStyles.container}>
