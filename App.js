@@ -6,8 +6,8 @@ import Login from './Components/Login';
 import SignUp from './Components/SignUp';
 
 
-import * as Font from 'expo-font';
 import { loadCustomFonts } from './LoadCustomFonts';
+import Splash from './Components/Splash';
 
 
 const Stack = createStackNavigator();
@@ -20,7 +20,8 @@ const App = () => {
   return (
     <>
             <NavigationContainer>
-              <Stack.Navigator initialRouteName='Login Page'>
+              <Stack.Navigator initialRouteName='Splash'>
+                  <Stack.Screen name='Splash' component={Splash} options={{headerShown: false }} />
                   <Stack.Screen name='Login Page' component={Login} />
                   <Stack.Screen name='Home' component={Home} />
                   <Stack.Screen name='SignUp' component={SignUp} />
