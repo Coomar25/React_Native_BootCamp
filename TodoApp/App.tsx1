@@ -1,0 +1,150 @@
+import React, { isValidElement, useEffect, useState } from "react";
+import database from '@react-native-firebase/database';
+import {
+  Text,
+  View,
+  Image,
+  TextInput,
+  ScrollView,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
+
+
+const App = () => {
+  const [ list , setList ] = useState(null);
+  const [inputvalue, setInputvalue] = useState('');
+
+  useEffect(()=> {
+    getDatabasedata();
+  },[]);
+
+
+  const getDatabasedata = () => {
+    try {
+      const databaseRef = database().ref('todo'); 
+      console.log(databaseRef);// Assuming 'todo/1/todolist' is the path to your data
+      databaseRef.on('value', snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          setList(data);
+        } else {
+          setList([]);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
+
+
+  const handleSubmitData = async() => {
+      try{
+        console.log(inputvalue);
+          const response = await database().ref("todo/7")
+          .set({
+              todolist: inputvalue,
+          });
+          // console.log(response);
+      }catch(error){
+        console.error(error);
+      }
+  }
+
+
+  return (
+    <View style={styles.container}>
+
+      <Text style={styles.title}>Todo App Using Firebase Realtime Database</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Add List here"
+        value={inputvalue}
+        onChangeText={(text) => setInputvalue(text)}
+      />
+
+        <TouchableOpacity
+          style={styles.LoginButtonWithOpacity}
+        >
+          <Text style={styles.LoginBtnText} onPress={()=>handleSubmitData()}>Add Todo List</Text>
+        </TouchableOpacity>
+
+        {/* <Text style={styles.lists}>{list}</Text> */}
+
+
+        <FlatList
+          style={styles.lists}
+          data={list ? Object.values(list) : []}  // Convert the object to an array
+          // data={list}
+          renderItem={({ item }) => {
+            return (
+              <>
+                    <Text style={styles.lists}>{item}</Text>
+              </>
+            );
+          }}
+        />
+
+
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    paddingTop: 40,
+  },
+
+  title: {
+    color:'#1b1b1b', 
+    paddingBottom:20, 
+    fontSize:30, 
+     fontWeight:'600',
+     textAlign:'center'
+  },
+
+  lists: {
+    paddingTop:30,
+    color:'#1b1b1b',
+    fontSize:15,
+    fontWeight: "400",
+  },
+
+  input: {
+    width: "80%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    borderRadius: 20,
+    color:'black',
+  },
+
+  LoginButtonWithOpacity: {
+    width: 300,
+    height: 50,
+    backgroundColor: "orange",
+    borderRadius: 25,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center",
+  },
+  LoginBtnText: {
+    alignSelf: "center",
+    alignItems: "center",
+    fontWeight: "600",
+    fontFamily: "PlaypenSans-ExtraBold",
+    letterSpacing: 1,
+  },
+});
+
+export default App;
