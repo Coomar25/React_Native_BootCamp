@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Modal from 'react-native-modal';
+// Firebase
 import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
+import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+let token= '';
 
 const SignUp = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -28,6 +36,25 @@ const SignUp = ({navigation}) => {
   const isValidEmail = email => {
     return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
   };
+
+
+  useEffect(()=> {
+    getFcmDeviceToken();
+  }, []);
+  const getFcmDeviceToken = async ()=>{
+    token = await messaging().getToken();
+    // console.log(token);
+  }
+
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      console.log(remoteMessage);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const handleSignUp = async () => {
     const newErrors = {};
@@ -64,13 +91,33 @@ const SignUp = ({navigation}) => {
           contact,
           address,
           password,
+          token,
         };
         const success = firestore()
           .collection('Users')
           .add(requestData)
           .then(() => {
             console.log('User added!');
+            // saveLocalData();
           });
+          const saveLocalData = async () => {
+            await AsyncStorage.setItem("USERNAME", username);
+            await AsyncStorage.setItem("EMAIL", email);
+
+            const storedUsername = await AsyncStorage.getItem("USERNAME");
+            const storedEmail = await AsyncStorage.getItem("EMAIL");
+
+            if (storedUsername !== null && storedEmail !== null) {
+              // Data is stored in AsyncStorage
+              console.log('Data found in AsyncStorage:');
+              console.log('Username: ' + storedUsername);
+              console.log('Email: ' + storedEmail);
+            } else {
+              // Data is not stored in AsyncStorage
+              console.log('No data found in AsyncStorage.');
+            }
+          };
+
         if (success) {
           setModalMessage('User created successfully!');
           setModalVisible(true);

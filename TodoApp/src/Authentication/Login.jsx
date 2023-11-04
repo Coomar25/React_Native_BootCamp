@@ -14,6 +14,7 @@ import {
 
 import messaging from '@react-native-firebase/messaging';
 import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({navigation}) => {
   const [error, setError] = useState('');
@@ -22,20 +23,18 @@ const Login = ({navigation}) => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-
   const isValidEmail = email => {
     return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
   };
 
-
+  // For notification
   useEffect(()=> {
-    getDeviceToken();
+    getFcmDeviceToken();
   }, []);
-  const getDeviceToken = async ()=>{
+  const getFcmDeviceToken = async ()=>{
     let token = await messaging().getToken();
-    console.log(token);
+    // console.log(token);
   }
-
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -55,6 +54,9 @@ const Login = ({navigation}) => {
         if (snapshot.docs.length > 0) {
           const userData = snapshot.docs[0].data();
           if(userData.email ==email && userData.password == password){
+            // store garam hai sabbai user ko data asyncstorage ma 
+                storeUserDataInAsyncStorage(userData);
+            // =====================================================
             setModalMessage('Login Success');
             setModalVisible(true);
             setTimeout(()=> {
@@ -75,6 +77,15 @@ const Login = ({navigation}) => {
       console.log(error);
     }
   };
+
+
+  const storeUserDataInAsyncStorage =async (userData) => {
+    try{
+        await AsyncStorage.setItem('userDataInAsyncStorage', JSON.stringify(userData));
+    }catch(error){
+      console.log('Error storing user data in AsyncStorage', error);
+    }
+  }
 
   return (
     <View style={styles.container}>
