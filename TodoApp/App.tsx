@@ -6,8 +6,10 @@ import Splash from './src/xomponent/Splash';
 import Home from './src/xomponent/Home';
 import Login from './src/Authentication/Login';
 import SignUp from './src/Authentication/SignUp';
-
 import { DefaultTheme } from '@react-navigation/native';
+
+
+
 
 const customTheme = {
   ...DefaultTheme,
@@ -25,7 +27,7 @@ const App = () => {
       <NavigationContainer theme={customTheme}>
         <Stack.Navigator initialRouteName='Splash'>
           <Stack.Screen name='Splash' component={Splash} options={{headerShown: false }} />
-          <Stack.Screen name='Home' component={Home} options={{headerShown: true }} />
+          <Stack.Screen name='Home' component={Home} options={{headerShown: false }} />
           <Stack.Screen name='Login' component={Login} options={{headerShown: false }} />
           <Stack.Screen name='SignUp' component={SignUp} options={{headerShown: false }} />
         </Stack.Navigator>
