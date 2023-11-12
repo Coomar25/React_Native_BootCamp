@@ -1,146 +1,152 @@
 import {
   View,
   Text,
+  FlatList,
+  Image,
   StyleSheet,
   TouchableOpacity,
-  Button,
-  PermissionsAndroid,
-  Image,
 } from 'react-native';
-import React, {useState} from 'react';
-import storage from '@react-native-firebase/storage';
-
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import React, {useEffect, useState} from 'react';
+import firestore from '@react-native-firebase/firestore';
 
 const Welcome = () => {
-  const [imageUri, setImageUri] = useState('');
-  const [fetchImageUrl, setfetchImageUrl] = useState('');
+  const [postdata, setPostdata] = useState([]);
 
-  const openCamera = async () => {
-    const result = await launchCamera({mediaType: 'photo'});
-    if (!result.didCancel) {
-      setImageUri(result);
-      // console.log(imageUri.assets[0].uri);
-      // const selectedImageUri = result.assets[0].uri;
-    }
+  // useEffect(() => {
+  //   const fetchAfterInterval = setInterval(()=> {
+  //     fetchPostData();
+  //   }, 100000);
+
+  //   return ()=> {
+  //     clearInterval(fetchAfterInterval);
+  //   }
+  // },[]);
+
+  useEffect(() => {
+    const fetchInterval = setInterval(() => {
+      fetchPostData();
+    }, 10000); 
+  
+    return () => {
+      clearInterval(fetchInterval);
+    };
+  }, []);
+  
+
+  // Fetch post data from database
+  const fetchPostData = () => {
+    firestore()
+      .collection('posts')
+      .get()
+      .then(querySnapshot => {
+        console.log('Total Posts: ', querySnapshot.size);
+        const allPostData = [];
+        querySnapshot.forEach(documentSnapshot => {
+          console.log(
+            'User ID: ',
+            documentSnapshot.id,
+            documentSnapshot.data(),
+          );
+          allPostData.push(documentSnapshot.data());
+        });
+        setPostdata(allPostData);
+      });
   };
-
-  const selectImageFromDevice = async () => {
-    const uploadFromDevice = await launchImageLibrary({mediaType: 'photo'});
-    setImageUri(uploadFromDevice);
-    // console.log(imageUri);
-  };
-
-  const uploadImage = async () => {
-    if (imageUri && imageUri.assets && imageUri.assets[0]) {
-      const reference = storage().ref(
-         imageUri.assets[0].fileName,
-      );
-      const pathToFile = imageUri.assets[0].uri;
-      // console.log(pathToFile);
-
-      try {
-        const uploadToFirebase = await reference.putFile(pathToFile);
-        if(uploadToFirebase){
-          console.log('Image uploaded successfully.');
-          const imageurlFromFireBase = await storage().ref(imageUri.assets[0].fileName).getDownloadURL();
-          setfetchImageUrl(imageurlFromFireBase);
-        }
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      }
-    } else {
-      console.log('No image to upload.');
-    }
-  };
-
-  const removePhoto = () => {
-    if (imageUri && imageUri.assets && imageUri.assets[0]) {
-      setImageUri(null); 
-    }else{
-      console.warn('Image does not exist');
-    }
-  } 
 
   return (
-    <View style={styles.container}>
+    <>
+      <View style={welcome.coreContainer}>
+        <FlatList
+          data={postdata}
+          renderItem={({item, index}) => {
+            return (
+              <View style={welcome.conainer}>
+                <View style={welcome.postHeader}>
+                  <View style={welcome.profileImageName}>
+                    <Image
+                      source={require('../../assets/icons/user.png')}
+                      style={welcome.profilePicture}
+                    />
+                    <Text style={welcome.username}>{item.username}</Text>
+                  </View>
+                </View>
+                <Image style={welcome.postImage} source={{uri: item.image}} />
+                <View style={welcome.likecommentContainer}>
+                  <TouchableOpacity>
+                    <Image
+                      source={require('../../assets/icons/love.png')}
+                      style={welcome.like}
+                    />
+                  </TouchableOpacity>
 
-      <View>
-            {imageUri && imageUri.assets && imageUri.assets[0] ? (
-              <Image
-                source={{uri: imageUri.assets[0].uri}}
-                style={styles.imagePlaceholder}
-              />
-            ) : (
-              <Text>No image</Text>
-            )}
+                  <TouchableOpacity>
+                    <Image
+                      source={require('../../assets/icons/chat.png')}
+                      style={welcome.chat}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <Text>{item.caption}</Text>
+              </View>
+            );
+          }}
+        />
       </View>
-
-
-      <View style={styles.buttonUpload}>
-         <TouchableOpacity
-          onPress={()=> removePhoto()}
-          style={[styles.button, {backgroundColor: 'orange'}]}>
-          <Text style={styles.buttonText}>Remove Image</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={openCamera}
-          style={[styles.button, {backgroundColor: 'orange'}]}>
-          <Text style={styles.buttonText}>Open Camera</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={()=> selectImageFromDevice()}
-          style={[styles.button, {backgroundColor: 'orange'}]}>
-          <Text style={styles.buttonText}>upload Device </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => uploadImage()}
-          style={[styles.button, {backgroundColor: 'orange'}]}>
-          <Text style={styles.buttonText}>Upload </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </>
   );
 };
 
-const styles = StyleSheet.create({
-
-  container: {
+const welcome = StyleSheet.create({
+  coreContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'black',
   },
-
-  imagePlaceholder: {
-    borderRadius:20,
-    width: 200, height: 200,
-    resizeMode: 'contain'
+  conainer: {
+    alignSelf: 'center',
+    padding: 12,
+    width: '100%',
   },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 10, // Add a border radius to round the corners of the image
+  username: {
+    fontSize: 20,
   },
-  buttonUpload: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop:100
+  postHeader: {
+    fontWeight: '600',
+    gap: 8,
+    position: 'relative',
+    zIndex: 1,
   },
-  button: {
-    width: 200,
-    height: 50,
-    backgroundColor: 'orange',
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10,
+  profileImageName: {
+    flexDirection: 'row',
+    gap: 8,
+    position: 'absolute',
+    zIndex: 2,
+    top: 3,
+    left: 4,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
+  postImage: {
+    height: 400,
+    width: 400,
+  },
+  profilePicture: {
+    width: 40,
+    height: 40,
+  },
+  like: {
+    width: 40,
+    height: 40,
+    tintColor: 'white',
+  },
+  chat: {
+    width: 36,
+    height: 36,
+    tintColor: 'white',
+  },
+  likecommentContainer: {
+    flexDirection: 'row',
+    gap: 9,
+    marginTop: 12,
+    marginLeft: 10,
   },
 });
 

@@ -94,12 +94,23 @@ const SignUp = ({navigation}) => {
           token,
         };
         const success = firestore()
-          .collection('Users')
+          .collection('users')
           .add(requestData)
           .then(() => {
             console.log('User added!');
-            // saveLocalData();
+            saveLocalData();
           });
+
+          // store garam fcmToken auta collection and send garne sabbai lai notification
+          firestore()
+          .collection('FCMtokens')
+          .add({
+            token: token
+          }).then(()=> {
+            console.log("fcm token store vayo device ma");
+          });
+
+
           const saveLocalData = async () => {
             await AsyncStorage.setItem("USERNAME", username);
             await AsyncStorage.setItem("EMAIL", email);

@@ -48,7 +48,7 @@ const Login = ({navigation}) => {
   const handleLogin = async () => {
     try {
         const snapshot = await firestore()
-          .collection('Users')
+          .collection('users')
           .where('email', '==', email)
           .get();
         if (snapshot.docs.length > 0) {
