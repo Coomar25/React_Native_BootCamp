@@ -76,7 +76,7 @@ const Add = () => {
     try {
       if (imageUri && userCaption) {
         setIsLoading(true);
-        setIsUploadButtonDisabled(true);4
+        setIsUploadButtonDisabled(true);
         const reference = storage().ref(imageUri.assets[0].fileName);
         const pathToFile = imageUri.assets[0].uri;
         // console.log(pathToFile);
@@ -85,6 +85,7 @@ const Add = () => {
           const uploadToFirebase = await reference.putFile(pathToFile);
           if (uploadToFirebase) {
             console.log('Image uploaded successfully.');
+            // image ko url fetch garne database bata 
             const imageurlFromFireBase = await storage()
               .ref(imageUri.assets[0].fileName)
               .getDownloadURL();

@@ -14,6 +14,7 @@ import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
 
 
 
@@ -92,7 +93,11 @@ const SignUp = ({navigation}) => {
           address,
           password,
           token,
+          uuid: uuid.v4(),
         };
+
+        console.log(requestData);
+        
         const success = firestore()
           .collection('users')
           .add(requestData)

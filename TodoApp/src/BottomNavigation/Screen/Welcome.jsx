@@ -25,7 +25,7 @@ const Welcome = () => {
   useEffect(() => {
     const fetchInterval = setInterval(() => {
       fetchPostData();
-    }, 10000); 
+    }, 10000000); 
   
     return () => {
       clearInterval(fetchInterval);
