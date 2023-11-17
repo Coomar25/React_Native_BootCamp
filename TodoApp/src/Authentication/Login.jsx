@@ -45,20 +45,38 @@ const Login = ({navigation}) => {
     return unsubscribe;
   }, []);
 
+
+//   useEffect(()=> {
+//     getUserIdFromAsyncStorage();
+//   });
+
+
+//  const getUserIdFromAsyncStorage = async () => {
+//    const userID = await AsyncStorage.getItem('USER_ID');
+//    console.log('User ID from AsyncStorage', userID);
+//  }
+
+// ===========================================================================================================//
+// =============================================Handle Login=====================================================//
+// ===========================================================================================================//
+
   const handleLogin = async () => {
     try {
         const snapshot = await firestore()
-          .collection('Users')
+          .collection('users')
           .where('email', '==', email)
           .get();
         if (snapshot.docs.length > 0) {
           const userData = snapshot.docs[0].data();
+          const userID = userData.uuid;
           if(userData.email ==email && userData.password == password){
             // store garam hai sabbai user ko data asyncstorage ma 
                 storeUserDataInAsyncStorage(userData);
             // =====================================================
             setModalMessage('Login Success');
             setModalVisible(true);
+            // store garam aava user ko id lai asyncstorage ma
+            await AsyncStorage.setItem('USER_ID', userID);
             setTimeout(()=> {
               navigation.navigate('Home');  
             }, 1500);
@@ -77,6 +95,11 @@ const Login = ({navigation}) => {
       console.log(error);
     }
   };
+
+// ===========================================================================================================//
+// =============================================Handle Login=====================================================//
+// ===========================================================================================================//
+
 
 
   const storeUserDataInAsyncStorage =async (userData) => {
