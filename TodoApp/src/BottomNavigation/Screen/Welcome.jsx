@@ -8,9 +8,28 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
+import { useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+
+let userID = '';
 
 const Welcome = () => {
   const [postdata, setPostdata] = useState([]);
+
+  // const [onLikeClick, setOnLikeClick] = useState(false);
+  // // const isFocused = useIsFocused();
+
+  // useEffect(()=> {
+  //   getUserIdFromAsyncStorage();
+  // }, [onLikeClick]);
+
+  const getUserIdFromAsyncStorage = async () => {
+     userID = await AsyncStorage.getItem('USER_ID');
+     console.log(userID);
+  }
 
   // useEffect(() => {
   //   const fetchAfterInterval = setInterval(()=> {
@@ -25,7 +44,7 @@ const Welcome = () => {
   useEffect(() => {
     const fetchInterval = setInterval(() => {
       fetchPostData();
-    }, 10000000); 
+    }, 20000); 
   
     return () => {
       clearInterval(fetchInterval);
@@ -53,6 +72,19 @@ const Welcome = () => {
       });
   };
 
+
+  // const getLikeStatus = (likes) => {
+  //   let likestatus = false;
+  //   likes.map(item => {
+  //     if(item === userID){
+  //       likestatus = true;
+  //     }else{
+  //       likestatus = false;
+  //     }
+  //   });
+  //   return likestatus;
+  // }
+
   return (
     <>
       <View style={welcome.coreContainer}>
@@ -71,20 +103,45 @@ const Welcome = () => {
                   </View>
                 </View>
                 <Image style={welcome.postImage} source={{uri: item.image}} />
-                <View style={welcome.likecommentContainer}>
-                  <TouchableOpacity>
-                    <Image
-                      source={require('../../assets/icons/love.png')}
-                      style={welcome.like}
-                    />
-                  </TouchableOpacity>
+                <View style={welcome.attrationContainer}>
+                  <View style={welcome.likecommentContainer}> 
+                      <Text style={welcome.likesCommentCount}>{'0'}</Text>
 
-                  <TouchableOpacity>
-                    <Image
-                      source={require('../../assets/icons/chat.png')}
-                      style={welcome.chat}
-                    />
-                  </TouchableOpacity>
+
+                      <TouchableOpacity>
+                        {/* {getLikeStatus(item.likes) ? (
+                           <Image
+                           source={require('../../assets/icons/love.png')}
+                           style={welcome.like}
+                         />
+                        ) : (
+                          <Image
+                          source={require('../../assets/icons/love.png')}
+                          style={welcome.alreadyLike}
+                        />
+                        )  } */}
+
+                        <Image
+                           source={require('../../assets/icons/love.png')}
+                           style={welcome.like}
+                         />
+
+                      
+                      </TouchableOpacity>
+
+
+                  </View>
+
+                  <View style={welcome.likecommentContainer}>
+                      <Text style={welcome.likesCommentCount}>{'0'}</Text>
+                      <TouchableOpacity>
+                        <Image
+                          source={require('../../assets/icons/chat.png')}
+                          style={welcome.chat}
+                        />
+                      </TouchableOpacity>
+                  </View>
+                
                 </View>
 
                 <Text>{item.caption}</Text>
@@ -137,6 +194,13 @@ const welcome = StyleSheet.create({
     height: 40,
     tintColor: 'white',
   },
+
+  alreadyLike: {
+    width: 40,
+    height: 40,
+    tintColor: 'red',
+  },
+
   chat: {
     width: 36,
     height: 36,
@@ -148,6 +212,19 @@ const welcome = StyleSheet.create({
     marginTop: 12,
     marginLeft: 10,
   },
+  likesCommentCount: {
+    color: 'white',
+    fontSize: 25,
+    fontWeight: '600',
+    justifyContent: 'center',
+    marginTop: 6,
+    marginRight:6
+  },
+  attrationContainer: {
+    gap: 10,
+    display: 'flex',
+    flexDirection: 'row',
+  }
 });
 
 export default Welcome;
