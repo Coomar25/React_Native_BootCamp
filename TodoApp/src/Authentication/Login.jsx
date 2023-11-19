@@ -69,7 +69,7 @@ const Login = ({navigation}) => {
         if (snapshot.docs.length > 0) {
           const userData = snapshot.docs[0].data();
           const userID = userData.uuid;
-          if(userData.email ==email && userData.password == password){
+          if(userData.email === email && userData.password === password){
             // store garam hai sabbai user ko data asyncstorage ma 
                 storeUserDataInAsyncStorage(userData);
             // =====================================================

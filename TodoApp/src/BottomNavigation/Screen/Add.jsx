@@ -15,6 +15,8 @@ import firestore from '@react-native-firebase/firestore';
 import {Alert} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+import axios from 'axios';
 
 let token = '';
 let AuthUserCredentials = '';
@@ -29,23 +31,23 @@ const Add = () => {
 
   useEffect(() => {
     getFcmDeviceToken();
-    // checkAsyncStorageData();
+    checkAsyncStorageData();
   }, []);
-
 
   
 
   const checkAsyncStorageData = async () => {
     const storedUsername = await AsyncStorage.getItem('USERNAME');
     const storedEmail = await AsyncStorage.getItem('EMAIL');
+    let userID = await AsyncStorage.getItem('USER_ID');
 
     if (storedUsername !== null && storedEmail !== null) {
       // Data is stored in AsyncStorage
-      console.log('Data found in AsyncStorage:');
+      console.log('Data found in AsyncStorage from checkAsyncStorageData():');
       console.log('Username: ' + storedUsername);
       console.log('Email: ' + storedEmail);
+      console.log('User ID from AsyncStorage', userID);
     } else {
-      // Data is not stored in AsyncStorage
       console.log('No data found in AsyncStorage.');
     }
   };
@@ -54,7 +56,8 @@ const Add = () => {
     token = await messaging().getToken();
     authUser = await AsyncStorage.getItem('userDataInAsyncStorage');
     AuthUserCredentials = JSON.parse(authUser);
-    console.log(token);
+    console.log('User Data from AsyncStorage stored in variable AuthUserCredentials: ' + AuthUserCredentials);
+    console.log('Device FCM token is :' + token);
   };
 
   const openCamera = async () => {
@@ -72,8 +75,9 @@ const Add = () => {
   };
 
   const uploadImage = async () => {
-
     try {
+      let userID = await AsyncStorage.getItem('USER_ID');
+      let postID = uuid.v4();
       if (imageUri && userCaption) {
         setIsLoading(true);
         setIsUploadButtonDisabled(true);
@@ -91,16 +95,22 @@ const Add = () => {
               .getDownloadURL();
               setfetchImageUrl(imageurlFromFireBase);
 
-            console.log(fetchImageUrl);
+            console.log('fetching the image url from firebase' + fetchImageUrl);
             const requestData = {
               username: AuthUserCredentials.username,
               email: AuthUserCredentials.email,
               image: imageurlFromFireBase,
               caption: userCaption,
+              uuid: userID,
+              postid: postID,
+              likes:[],
+              comments:[]
             };
-            console.log(requestData);
+            console.log('this is the post data to the database' + requestData);
             const success = firestore()
               .collection('posts')
+              // .doc(postID)
+              // .set(requestData)
               .add(requestData)
               .then(() => {
                 console.log('post added successfully!');
@@ -110,6 +120,7 @@ const Add = () => {
                 uploadVayaseTokenFetchGarneResponseMaCallGarera();
                 setIsLoading(false);
                 setIsUploadButtonDisabled(false);
+                navigation.navigate('Home');
               });
             if (success) {
               setuserCaption(null);
@@ -153,33 +164,35 @@ const Add = () => {
   }
 
   const aavaNotificationSendGarne = async (token) => {
-        var axios = require('axios');
-        var data = JSON.stringify({
-        data: {},
-        notification: {
-        body: 'click to open check Post',
-        title: 'New Post Added',
-        },
-        to: token,
-        });
-        var config = {
-        method: 'post',
-        url: 'https://fcm.googleapis.com/fcm/send',
-        headers: {
-        Authorization:
-        'key=AAAAHs1MzE4:APA91bG9YnFDNCFlYbbmRGStmHNkhwIPEsGRxN_LR_SmaxXRttk3B1OB8Qoe2_ZI-jMme2TD846pOg8HUoJaNawF0Q-n2ibASljimpGUZ0ekX20grm_7XOpTNkq8eY6ls3-Aa9EozscZ',
-        'Content-Type': 'application/json',
-        },
-        data: data,
-        };
-        axios(config)
-        .then(function (response) {
-        console.log(JSON.stringify(response.data));
-        })
-        .catch(function (error) {
-        console.log(error);
-        });
+        // var axios = require('axios');
+        // var data = JSON.stringify({
+        // data: {},
+        // notification: {
+        // body: 'click to open check Post',
+        // title: 'New Post Added',
+        // },
+        // to: token,
+        // });
+        // var config = {
+        // method: 'post',
+        // url: 'https://fcm.googleapis.com/fcm/send',
+        // headers: {
+        // Authorization:
+        // 'key=AAAAHs1MzE4:APA91bG9YnFDNCFlYbbmRGStmHNkhwIPEsGRxN_LR_SmaxXRttk3B1OB8Qoe2_ZI-jMme2TD846pOg8HUoJaNawF0Q-n2ibASljimpGUZ0ekX20grm_7XOpTNkq8eY6ls3-Aa9EozscZ',
+        // 'Content-Type': 'application/json',
+        // },
+        // data: data,
+        // };
+        // axios(config)
+        // .then(function (response) {
+        // console.log(JSON.stringify(response.data));
+        // })
+        // .catch(function (error) {
+        // console.log(error);
+        // });
   }
+
+
 
 
 

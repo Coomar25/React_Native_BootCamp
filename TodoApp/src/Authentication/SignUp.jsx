@@ -84,6 +84,8 @@ const SignUp = ({navigation}) => {
         'Password Do not match! Please re-enter the password';
     }
     setErrors(newErrors);
+
+
     if (Object.keys(newErrors).length === 0) {
       try {
         const requestData = {
@@ -102,7 +104,7 @@ const SignUp = ({navigation}) => {
           .collection('users')
           .add(requestData)
           .then(() => {
-            console.log('User added!');
+            console.log('User added! successfully in firestore database');
             saveLocalData();
           });
 
@@ -135,6 +137,7 @@ const SignUp = ({navigation}) => {
           };
 
         if (success) {
+          console.log('stored successfully in database' + success);
           setModalMessage('User created successfully!');
           setModalVisible(true);
           setTimeout(() => {

@@ -83,7 +83,7 @@ const BottomNavigator = () => {
             tabBarIcon: tabInfo => {
               return (
                 <Image
-                  source={require('../assets/icons/add_FILL0_wght400_GRAD0_opsz24.png')}
+                  source={require('../assets/icons/more.png')}
                   style={{
                     width: 30,
                     height: 30,
@@ -114,7 +114,7 @@ const BottomNavigator = () => {
             tabBarIcon: tabInfo => {
               return (
                 <Image
-                  source={require('../assets/icons/chat_FILL0_wght400_GRAD0_opsz24.png')}
+                  source={require('../assets/icons/chat.png')}
                   style={{
                     width: 30,
                     height: 30,
@@ -145,7 +145,7 @@ const BottomNavigator = () => {
             tabBarIcon: tabInfo => {
               return (
                 <Image
-                  source={require('../assets/icons/person_FILL0_wght400_GRAD0_opsz24.png')}
+                  source={require('../assets/icons/user.png')}
                   style={{
                     width: 30,
                     height: 30,
