@@ -3,10 +3,12 @@ import { View, Text, Image, FlatList, TouchableOpacity } from "react-native";
 import chatFaceData from "../Services/ChatFaceData";
 import { styles } from "./styles/HomeScreenStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const [chatfacedata, setChatfacedata] = useState([]);
   const [selectedchatfacedata, setSelectedchatfacedata] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     setChatfacedata(chatFaceData);
@@ -75,6 +77,7 @@ export default function HomeScreen() {
           styles.OkeyBtn,
           { backgroundColor: selectedchatfacedata.primary },
         ]}
+        onPress={() => navigation.navigate("chat")}
       >
         <Text style={{ fontSize: 15, fontWeight: "bold", color: "white" }}>
           Okey! To Go
