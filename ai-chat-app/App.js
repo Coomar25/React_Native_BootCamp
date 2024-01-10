@@ -1,9 +1,12 @@
 import { View, Text } from "react-native";
-import HomeScreen from "./App/Pages/HomeScreen";
+import { NavigationContainer } from "@react-navigation/native";
+import Navigation from "./App/Navigation/Navigation";
 export default function App() {
   return (
     <View>
-      <HomeScreen />
+      <NavigationContainer>
+        <Navigation />
+      </NavigationContainer>
     </View>
   );
 }
