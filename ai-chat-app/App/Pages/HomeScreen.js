@@ -4,6 +4,7 @@ import chatFaceData from "../Services/ChatFaceData";
 import { styles } from "./styles/HomeScreenStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 export default function HomeScreen() {
   const [chatfacedata, setChatfacedata] = useState([]);
@@ -19,6 +20,25 @@ export default function HomeScreen() {
     const arrayIndex = id - 1;
     setSelectedchatfacedata(chatfacedata[arrayIndex]);
     await AsyncStorage.setItem("chatItem", String(arrayIndex));
+  };
+
+  const pingServer = async () => {
+    try {
+      const response = await fetch(
+        "http://10.0.2.2:8000/auth/bardapi/sdfasdfasd",
+        {
+          mode: "no-cors",
+        }
+      );
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Fetched data:", data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -77,10 +97,27 @@ export default function HomeScreen() {
           styles.OkeyBtn,
           { backgroundColor: selectedchatfacedata.primary },
         ]}
-        onPress={() => navigation.navigate("chat")}
+        onPress={() =>
+          navigation.navigate("chat", { selectedface: selectedchatfacedata })
+        }
       >
         <Text style={{ fontSize: 15, fontWeight: "bold", color: "white" }}>
           Okey! To Go
+        </Text>
+      </TouchableOpacity>
+      {/* =================================================================================================== */}
+      {/* =================================================================================================== */}
+      {/* =================================================================================================== */}
+
+      <TouchableOpacity
+        style={[
+          styles.OkeyBtn,
+          { backgroundColor: selectedchatfacedata.primary },
+        ]}
+        onPress={pingServer}
+      >
+        <Text style={{ fontSize: 15, fontWeight: "bold", color: "white" }}>
+          Test Ping
         </Text>
       </TouchableOpacity>
     </View>
